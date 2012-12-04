@@ -1,25 +1,37 @@
 #Possible calls
 
 `http://inmyti.me/5pm<timezone>`
+
 `http://inmyti.me/5am<timezone>`
+
 `http://inmyti.me/16<timezone>`
+
 `http://inmyti.me/5:30pm<timezone>`
+
 `http://inmyti.me/5:30am<timezone>`
+
 `http://inmyti.me/16:30<timezone>`
+
 `http://inmyti.me/16:30<timezone>`
+
 `http://inmyti.me/1600<timezone>`
+
 `http://inmyti.me/0500<timezone>`
 
 Will count as AM
+
 `http://inmyti.me/5<timezone>`
 
 Will count as PM
+
 `http://inmyti.me/16<timezone>`
 
 Will show user's current time
+
 `http://inmyti.me/`
 
 Will show the time in this timezone
+
 `http://inmyti.me/<timezone>`
 
 #API
