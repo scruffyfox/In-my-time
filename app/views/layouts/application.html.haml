@@ -5,7 +5,9 @@
     = stylesheet_link_tag "application"
     = javascript_include_tag "application"
     %script{:src=>"app.js", :type=>"text/javascript"}
-    = yield
+
+    %body{"onload" => "loadTime()"}
+      = yield
 
     - if !(request.env["HTTP_REFERER"] || "").include?("nojs")
       %noscript

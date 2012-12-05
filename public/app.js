@@ -22,9 +22,10 @@ function getTime()
 	}
 }
 
-var time = getTime();
-$(document).ready(function()
+function loadTime()
 {
-	console.log(time.out_time);
-	document.getElementById("time").innerHTML = time.out_time + " " + time.out_timezone;
-});
+  console.log(time.out_time);
+  document.getElementById("time").innerHTML = time.out_time + " " + time.out_timezone;
+}
+
+var time = getTime();

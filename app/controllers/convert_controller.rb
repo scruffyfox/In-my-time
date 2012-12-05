@@ -5,8 +5,7 @@ class ConvertController < ApplicationController
 
   def index
     @response = {
-      "out_time" => "4pm",
-      "out_timezone" => "GMT-1"
+     'out_time' => '4pm'
     }
 
     if (request.fullpath.include?("nojs"))
@@ -16,6 +15,7 @@ class ConvertController < ApplicationController
     respond_with(@switches) do |format|
       format.html
       format.json { render :json => @response.to_json }
+      format.xml { render :xml => @response.to_xml(:root => 'time') }
     end
   end
 end
