@@ -12,7 +12,7 @@ function getTime()
 	if (AJAX)
 	{
 		AJAX.open("GET", document.URL + ".json", false);
-		AJAX.setRequestHeader("X-Timezone", "" + new Date().getTimezoneOffset());
+		AJAX.setRequestHeader("X-Timezone", "" + (-new Date().getTimezoneOffset()));
 		AJAX.send(null);
 		return JSON.parse(AJAX.responseText);
 	} 
