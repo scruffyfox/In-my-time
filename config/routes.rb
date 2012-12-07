@@ -56,8 +56,9 @@ Inmytime::Application.routes.draw do
   # Note: This route will make all actions in every controller accessible via GET requests.
   # match ':controller(/:action(/:id))(.:format)'
 
-  match '/:time(.:format)' => 'convert#index'
-   match '/.:format' => 'convert#index'
-  match '/:time' => 'convert#index'
-  match '/' => 'convert#index'
+  # match '/:time(.:format)' => 'convert#index'
+  #match '/.:format' => 'convert#index'
+  #match '/:time' => 'convert#index', :constraints => {:time => /.*/}
+  # match '/' => 'convert#index'
+  match '*time', :to => 'convert#index'
 end

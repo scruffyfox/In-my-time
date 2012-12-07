@@ -25,7 +25,7 @@ function getTime()
 function loadTime()
 {
   console.log(time.out_time);
-  document.getElementById("time").innerHTML = time.out_time + " " + time.out_timezone;
+  document.getElementById("time").innerHTML = time.in_time + " " + time.in_timezone + " = " + time.out_time + " " + time.out_timezone;
 }
 
 var time = getTime();
