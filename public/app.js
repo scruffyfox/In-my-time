@@ -11,6 +11,8 @@ function getTime()
 
 	if (AJAX)
 	{
+    parts = document.URL.split("/")
+    if (parts[parts.length - 1].length == 0) return
 		AJAX.open("GET", document.URL + ".json", false);
 		AJAX.setRequestHeader("X-Timezone", "" + (-new Date().getTimezoneOffset()));
 		AJAX.send(null);

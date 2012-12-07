@@ -59,6 +59,6 @@ Inmytime::Application.routes.draw do
   # match '/:time(.:format)' => 'convert#index'
   #match '/.:format' => 'convert#index'
   #match '/:time' => 'convert#index', :constraints => {:time => /.*/}
-  # match '/' => 'convert#index'
+  match '/' => 'convert#current'
   match '*time', :to => 'convert#index'
 end

@@ -4,6 +4,21 @@ require 'date'
 class ConvertController < ApplicationController
   respond_to :html, :xml, :json
 
+  def current
+     @response = {
+     'in_time' => '',
+     'in_timezone' => '',
+     'out_time' => '',
+     #'out_date' => '',
+     'out_timezone' => ''
+    }
+
+    date = DateTime.now
+    @response['out_time'] = date.to_formatted_s(:time)
+    @response['out_date'] = date.strftime("%d/%m")
+    @response['out_timezone'] = "UTC+0"
+  end
+
   def index
     @response = {
      'in_time' => '',
@@ -13,8 +28,11 @@ class ConvertController < ApplicationController
      'out_timezone' => ''
     }
 
-    if (!params[:format].match(/(json|xml|html)/))
-      params[:time] += "." + params[:format].clone
+    params[:time] = params[:time] || DateTime.now.strftime("%H:%M")
+    timezone = request.headers['x-timezone'] || params[:timezone] || "UTC"
+
+    if (!(params[:format] || "").match(/(json|xml|html)/))
+      params[:time] += "." + (params[:format] || "").clone
       params[:format] = "html"
     end
 
@@ -22,8 +40,6 @@ class ConvertController < ApplicationController
     # => 1100
     # => 11
     # => 1
-    params[:time] = params[:time] || DateTime.now.strftime("%H:%M")
-    timezone = request.headers['x-timezone'] || params[:timezone]
 
     if (timezone != nil)
       # replace common timezones with proper timezone
@@ -42,8 +58,13 @@ class ConvertController < ApplicationController
         end
       else
         time = params[:time].gsub(/[^0-9]/, "")
-        newtime = time.clone
 
+        if (time.length < 1)
+          render :json => {"error"=>"invalid date"}
+          return
+        end
+
+        newtime = time.clone
         newtime = newtime.insert(newtime.length - 2, ":")
 
         if (newtime.length == 2)
