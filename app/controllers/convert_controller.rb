@@ -2,7 +2,7 @@ require 'json'
 require 'date'
 
 class ConvertController < ApplicationController
-  respond_to :html, :xml, :json
+  respond_to :html, :xml, :json, :yaml
 
   def current
      @response = {
@@ -31,7 +31,7 @@ class ConvertController < ApplicationController
     params[:time] = params[:time] || DateTime.now.strftime("%H:%M")
     timezone = request.headers['x-timezone'] || params[:timezone] || "UTC"
 
-    if (!(params[:format] || "").match(/(json|xml|html)/))
+    if (!(params[:format] || "").match(/(json|xml|html|yaml)/))
       params[:time] += "." + (params[:format] || "").clone
       params[:format] = "html"
     end
@@ -48,7 +48,7 @@ class ConvertController < ApplicationController
       params[:time] = params[:time].gsub(/ct/i, "CST")
 
       # format all non 0-9, a-z, :, -, + characters
-      params[:time] = params[:time].gsub(/([^0-9A-Za-z:-\\+\s]+)/, "")
+      params[:time] = params[:time].gsub(/([^0-9A-Za-z:-\\+\s-]+)/, "")
 
       if (params[:time].include?(":"))
         if (params[:time].match(/(am|pm)/))
@@ -60,7 +60,7 @@ class ConvertController < ApplicationController
         time = params[:time].gsub(/[^0-9]/, "")
 
         if (time.length < 1)
-          render :json => {"error"=>"invalid date"}
+          try_render({"error" => "invalid date"})
           return
         end
 
@@ -89,7 +89,7 @@ class ConvertController < ApplicationController
       end
 
       timezone = timezone.gsub(/\s/, "")
-      @response['in_timezone'] = params[:time].clone.gsub(/([0-9:.\\+\s]+)(am|pm)/i, "").strip.upcase
+      @response['in_timezone'] = params[:time].clone.gsub(/([0-9:.\\+\s-]+)(am|pm)/i, "").strip.upcase
 
       #timezone = "-300" #EST -300 minutes
       #timezone = "GMT" #GMT -300 minutes
@@ -142,10 +142,22 @@ class ConvertController < ApplicationController
       @response = {"error" => {"message" => "No timezone supplied. Supply a header with the key \"x-timezone\" or a request parameter with the name \"timezone\""}}
     end
 
+    try_render(@response)
+  end
+
+  def try_render(response)
     if (params[:format] == 'json')
-      render :json => @response.to_json
+      render :json => response.to_json
     elsif (params[:format] == 'xml')
-      render :xml => @response.to_xml(:root => 'time')
+      if (response['error'])
+        render :xml => response.to_xml(:root => 'error')
+        return
+      end
+
+      render :xml => response.to_xml(:root => 'time')
+    elsif (params[:format] == 'yaml')
+      puts "test"
+      render :text => response.to_yaml
     end
   end
 end

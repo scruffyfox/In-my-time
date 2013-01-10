@@ -3,3 +3,4 @@ require File.expand_path('../application', __FILE__)
 
 # Initialize the rails application
 Inmytime::Application.initialize!
+Mime::Type.register 'text/yaml', :yaml
