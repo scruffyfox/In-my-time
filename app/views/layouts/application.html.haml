@@ -18,8 +18,7 @@
           %a{:href=>"mailto:callum@callumtaylor.net"} contact
           &nbsp;|&nbsp;
           %a{:href=>"https://github.com/scruffyfox/In-my-time"} github
-
-    - if !(request.env["HTTP_REFERER"] || "").include?("nojs")
+    - if !(request.env["REQUEST_URI"] || "").include?("nojs")
       %noscript
         %meta{"http-equiv" => "refresh", :content => "0;URL='?nojs'"}
 
