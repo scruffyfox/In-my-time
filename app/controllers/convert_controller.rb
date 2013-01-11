@@ -128,20 +128,24 @@ class ConvertController < ApplicationController
       timezone = (timezone < 0 ? "" : "+") + timezone.to_s
       timezone_diff = timezone.to_i * 60 * 60
 
-      test = DateTime.parse(params[:time])
-      final_time = test.to_i + timezone_diff
+      begin
+        test = DateTime.parse(params[:time])
+        final_time = test.to_i + timezone_diff
 
-      date = Time.at(final_time).utc()
-      @response['in_time'] = test.to_formatted_s(:time)
-      @response['out_time'] = date.to_formatted_s(:time)
-      @response['out_date'] = date.strftime("%d/%m")
-      @response['out_timezone'] = "UTC" + timezone
+        date = Time.at(final_time).utc()
+        @response['in_time'] = test.to_formatted_s(:time)
+        @response['out_time'] = date.to_formatted_s(:time)
+        @response['out_date'] = date.strftime("%d/%m")
+        @response['out_timezone'] = "UTC" + timezone
 
-      if (request.fullpath.include?("nojs"))
-        #figgure out timezone from IP
-        @response['out_time'] = "TBI"
-      else
+        if (request.fullpath.include?("nojs"))
+          #figgure out timezone from IP
+          @response['out_time'] = "TBI"
+        else
 
+        end
+      rescue Exception => ex
+        @response = {"error" => {"message" => ex.message}}
       end
     else
       @response = {"error" => {"message" => "No timezone supplied. Supply a header with the key \"x-timezone\" or a request parameter with the name \"timezone\""}}
