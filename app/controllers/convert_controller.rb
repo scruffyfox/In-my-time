@@ -34,6 +34,11 @@ class ConvertController < ApplicationController
     if (!(params[:format] || "").match(/(json|xml|html|yaml)/))
       params[:time] += "." + (params[:format] || "").clone
       params[:format] = "html"
+    else
+      if (params[:time] == "api")
+        api()
+        return
+      end
     end
 
     #parse the params time
@@ -159,5 +164,9 @@ class ConvertController < ApplicationController
       puts "test"
       render :text => response.to_yaml
     end
+  end
+
+  def api()
+    render :layout=>"api"
   end
 end

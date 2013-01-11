@@ -1,0 +1,103 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+%html
+  %head   
+    %title API
+    %link{:href=>"http://roboto-webfont.googlecode.com/svn/trunk/roboto.all.css", :rel=>"stylesheet", :type=>"text/css"}
+    = stylesheet_link_tag "application"
+    = javascript_include_tag "application"
+
+    %body{:style=>"padding: 1% 0"}
+      .content
+        %h1{:style=>"font-size: 38px"} In my time API
+        %p
+          The API is very straight forward and follows the following simple parameters.
+
+        %h3
+          Calls
+
+        %p
+          The following calls would be vaild, all base URLs are
+          .code
+            %span http://inmyti.me/
+
+        %h3 Supported formats
+
+        %p
+          .code 
+            %span 5pm&lt;timezone&gt;
+          .code 
+            %span 5am&lt;timezone&gt;
+          .code 
+            %span 17&lt;timezone&gt;
+          .code 
+            %span 5:30pm&lt;timezone&gt;
+          .code 
+            %span 5:30am&lt;timezone&gt;
+          .code 
+            %span 17:30&lt;timezone&gt;
+          .code 
+            %span 1700&lt;timezone&gt;
+          .code 
+            %span 0500&lt;timezone&gt;
+
+        %p
+          Timezones can be in any format, but for hour modifiers such as GMT+5 you must pass +5 or -5. Passing 5 will count as +5.
+
+        %h3 Formats
+
+        %p
+          You may append the formats .json, .xml or .yaml to the end of the call to specify the format. Not specifying one will default to the html front end page.
+
+        %p
+          When doing a request you
+          %b must
+          either supply
+          .code 
+            %span ?timezone
+          in the query parameters or
+          .code 
+            %span x-timezone
+          in the request headers.
+
+        %h3 Example
+        .code
+          %span 
+            %a{:href=>"http://inmyti.me/1600pmEST.json?timezone=UTC"} http://inmyti.me/1600pmEST.json?timezone=UTC
+
+        %h2 json
+        %pre.code.span
+          {"in_time":"16:00","in_timezone":"EST","out_time":"21:00","out_timezone":"UTC+0","out_date":"11/01"}
+        %h2 yaml
+        %pre.code.span
+          :preserve
+            ---
+              in_time: '16:00'
+              in_timezone: EST
+              out_time: '21:00'
+              out_timezone: UTC+0
+              out_date: 11/01
+        %h2 xml
+        %pre.code.span
+          :preserve
+            &lt;time&gt;
+            &lt;in-time>16:00&lt;/in-time&gt;
+            &lt;in-timezone>EST&lt;/in-timezone&gt;
+            &lt;out-time>21:00&lt;/out-time&gt;
+            &lt;out-timezone>UTC+0&lt;/out-timezone&gt;
+            &lt;out-date>11/01&lt;/out-date&gt;
+            &lt;/time&gt;
+        .footer
+          %a{:href=>"api.html"} api
+          &nbsp;|&nbsp;
+          %a{:href=>"mailto:callum@callumtaylor.net"} contact
+          &nbsp;|&nbsp;
+          %a{:href=>"https://github.com/scruffyfox/In-my-time"} github
+:javascript
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-36814155-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();

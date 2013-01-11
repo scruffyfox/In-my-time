@@ -2,12 +2,22 @@
 %html
   %head   
     %title What's that in my time?
+    %link{:href=>"http://roboto-webfont.googlecode.com/svn/trunk/roboto.all.css", :rel=>"stylesheet", :type=>"text/css"}
     = stylesheet_link_tag "application"
     = javascript_include_tag "application"
     %script{:src=>"app.js", :type=>"text/javascript"}
 
     %body{"onload" => "loadTime()"}
-      = yield
+      .content
+        #time
+          = yield
+
+        .footer
+          %a{:href=>"api.html"} api
+          &nbsp;|&nbsp;
+          %a{:href=>"mailto:callum@callumtaylor.net"} contact
+          &nbsp;|&nbsp;
+          %a{:href=>"https://github.com/scruffyfox/In-my-time"} github
 
     - if !(request.env["HTTP_REFERER"] || "").include?("nojs")
       %noscript

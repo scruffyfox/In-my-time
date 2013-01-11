@@ -27,7 +27,14 @@ function getTime()
 function loadTime()
 {
   parts = document.URL.split("/")
-  document.getElementById("time").innerHTML = decodeURI(parts[parts.length - 1]) + " = " + time.out_time + " " + time.out_timezone;
+  if (time.error)
+  {
+   document.getElementById("time").innerHTML = "<h1>Error</h1><h2>You tried to convert an invalid time</h2>"; 
+  }
+  else
+  {
+    document.getElementById("time").innerHTML = "<h2>" + decodeURI(parts[parts.length - 1]) + " in your time is</h2><h1>" + time.out_time + " " + time.out_timezone + "</h1>";
+  }
 }
 
 var time = getTime();
