@@ -55,6 +55,7 @@ GEM
       treetop (~> 1.4.8)
     mime-types (1.19)
     multi_json (1.4.0)
+    net-http-persistent (2.8)
     polyglot (0.3.3)
     rack (1.4.1)
     rack-cache (1.2)
@@ -81,6 +82,11 @@ GEM
     rake (10.0.2)
     rdoc (3.12)
       json (~> 1.4)
+    rest (2.1.0)
+      net-http-persistent
+      rest-client (>= 0.3.0)
+    rest-client (1.6.7)
+      mime-types (>= 1.16)
     sass (3.2.3)
     sass-rails (3.2.5)
       railties (~> 3.2.0)
@@ -111,6 +117,7 @@ DEPENDENCIES
   haml
   jquery-rails
   rails (= 3.2.8)
+  rest
   sass-rails (~> 3.2.3)
   therubyracer
   uglifier (>= 1.0.3)

@@ -8,6 +8,7 @@ gem 'rails', '3.2.8'
 gem 'execjs'
 gem 'therubyracer'
 gem 'haml'
+gem 'rest'
 
 # Gems used only for assets and not required
 # in production environments by default.

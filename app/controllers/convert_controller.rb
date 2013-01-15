@@ -1,5 +1,6 @@
 require 'json'
 require 'date'
+require 'rest'
 
 class ConvertController < ApplicationController
   respond_to :html, :xml, :json, :yaml
@@ -19,17 +20,24 @@ class ConvertController < ApplicationController
     @response['out_timezone'] = "UTC+0"
   end
 
+  def getTimezone()
+    url = 'http://api.ipinfodb.com/v3/ip-city/?key=3d3ffa73b3ae5e0307afc03a09f818af9a1ad47bee870dea658e86df13e844de&format=json&ip=' + (request.remote_ip || '0.0.0.0')
+    rest = Rest::Client.new
+    response = rest.get url
+    result = JSON.parse(response.body)
+    return result['timeZone']
+  end
+
   def index
     @response = {
      'in_time' => '',
      'in_timezone' => '',
      'out_time' => '',
-     #'out_date' => '',
      'out_timezone' => ''
     }
 
     params[:time] = params[:time] || DateTime.now.strftime("%H:%M")
-    timezone = request.headers['x-timezone'] || params[:timezone] || "UTC"
+    timezone = request.headers['x-timezone'] || params[:timezone] || getTimezone()
 
     if (!(params[:format] || "").match(/(json|xml|html|yaml)/))
       params[:time] += "." + (params[:format] || "").clone
@@ -45,7 +53,6 @@ class ConvertController < ApplicationController
     # => 1100
     # => 11
     # => 1
-
     if (timezone != nil)
       # replace common timezones with proper timezone
       # => CT => CST
@@ -94,7 +101,7 @@ class ConvertController < ApplicationController
       end
 
       timezone = timezone.gsub(/\s/, "")
-      @response['in_timezone'] = params[:time].clone.gsub(/([0-9:.\\+\s-]+)(am|pm)/i, "").strip.upcase
+      @response['in_timezone'] = params[:time].clone.gsub(/([0-9:.\\+\s-]+)(am|pm)?/i, "").strip.upcase
 
       #timezone = "-300" #EST -300 minutes
       #timezone = "GMT" #GMT -300 minutes
@@ -103,7 +110,6 @@ class ConvertController < ApplicationController
       #whole numbers mean minutes offset from UTC
       #accepted other formats:
       # => (GMT/UTC)+/-0-14
-
       if (timezone.match(/[^0-9\+-]/))
         if (!timezone.match(/(-|\+)/))
           tmp_zone = timezone.clone
@@ -137,13 +143,6 @@ class ConvertController < ApplicationController
         @response['out_time'] = date.to_formatted_s(:time)
         @response['out_date'] = date.strftime("%d/%m")
         @response['out_timezone'] = "UTC" + timezone
-
-        if (request.fullpath.include?("nojs"))
-          #figgure out timezone from IP
-          @response['out_time'] = "TBI"
-        else
-
-        end
       rescue Exception => ex
         @response = {"error" => {"message" => ex.message}}
       end
