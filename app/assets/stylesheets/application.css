@@ -38,6 +38,11 @@ h1, h1.time
   line-height: 122px;
 }
 
+.example
+{
+  font-size: 14px;
+}
+
 h2
 {
   font-weight: 100;

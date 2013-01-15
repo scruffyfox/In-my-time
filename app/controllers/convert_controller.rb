@@ -69,7 +69,7 @@ class ConvertController < ApplicationController
           # => 15:00
         end
       else
-        time = params[:time].gsub(/[^0-9]/, "")
+        time = params[:time].gsub(/([a-zA-Z\+\-][0-9]?)+/, "")
 
         if (time.length < 1)
           try_render({"error" => "invalid date"})
@@ -77,10 +77,15 @@ class ConvertController < ApplicationController
         end
 
         newtime = time.clone
-        newtime = newtime.insert(newtime.length - 2, ":")
 
-        if (newtime.length == 2)
+        if (newtime.length == 1)
+          newtime = "0" + newtime + "00"
+        elsif (newtime.length == 2)
           newtime += "00"
+        end
+
+        if (newtime.length > 2)
+          newtime = newtime.insert(newtime.length - 2, ":")
         end
 
         if (newtime.length < 4)
@@ -92,6 +97,7 @@ class ConvertController < ApplicationController
           newtime = tmptime.reverse.join(":")
         end
 
+        puts newtime
         params[:time] = params[:time].gsub(time, newtime)
       end
 
@@ -101,7 +107,8 @@ class ConvertController < ApplicationController
       end
 
       timezone = timezone.gsub(/\s/, "")
-      @response['in_timezone'] = params[:time].clone.gsub(/([0-9:.\\+\s-]+)(am|pm)?/i, "").strip.upcase
+      matches = params[:time].clone.match(/([a-zA-Z\+\-]+[0-9]?)+/)
+      @response['in_timezone'] = matches == nil ? "" : matches[0].upcase
 
       #timezone = "-300" #EST -300 minutes
       #timezone = "GMT" #GMT -300 minutes

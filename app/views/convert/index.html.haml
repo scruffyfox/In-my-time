@@ -1,6 +1,10 @@
 #time
-  %h2
-    = @response['in_time'] + " " + @response['in_timezone']
-    in your time is
-  %h1
-    = @response['out_time'] + " " + @response['out_timezone']
+  - if @response['error'] == nil
+    %h2
+      = @response['in_time'] + " " + @response['in_timezone']
+      in your time is
+    %h1
+      = @response['out_time'] + " " + @response['out_timezone']
+  - else
+    %h1 Error
+    %h2 You tried to convert an invalid time

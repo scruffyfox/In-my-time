@@ -1,2 +1,11 @@
 %h1.time
   = "Current time is " + @response['out_time'] + " " + @response['out_timezone']
+.example
+  %p
+    Examples:
+  %p 
+    %a{:href=>"http://inmyti.me/12pmEST"} http://inmyti.me/12pmEST
+    %br
+    %a{:href=>"http://inmyti.me/1700GMT-5"} http://inmyti.me/1700GMT-5
+    %br
+    %a{:href=>"http://inmyti.me/1.30PDT"} http://inmyti.me/1.30PDT
