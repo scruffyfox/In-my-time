@@ -42,11 +42,6 @@ class ConvertController < ApplicationController
     if (!(params[:format] || "").match(/(json|xml|html|yaml)/))
       params[:time] += "." + (params[:format] || "").clone
       params[:format] = "html"
-    else
-      if (params[:time] == "api")
-        api()
-        return
-      end
     end
 
     #parse the params time
@@ -63,7 +58,7 @@ class ConvertController < ApplicationController
       params[:time] = params[:time].gsub(/([^0-9A-Za-z:-\\+\s-]+)/, "")
 
       if (!params[:time].include?(":"))
-        time = params[:time].gsub(/([a-zA-Z\+\-][0-9]?)+/, "")
+        time = params[:time].gsub(/([a-zA-Z\+\-\s][0-9]?)+/, "")
 
         if (time.length < 1)
           try_render({"error" => "invalid date"})
@@ -166,9 +161,5 @@ class ConvertController < ApplicationController
       puts "test"
       render :text => response.to_yaml
     end
-  end
-
-  def api()
-    render :layout => "api"
   end
 end
