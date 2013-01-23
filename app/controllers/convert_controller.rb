@@ -62,13 +62,7 @@ class ConvertController < ApplicationController
       # format all non 0-9, a-z, :, -, + characters
       params[:time] = params[:time].gsub(/([^0-9A-Za-z:-\\+\s-]+)/, "")
 
-      if (params[:time].include?(":"))
-        if (params[:time].match(/(am|pm)/))
-          # => 15:00pm | 15:00am
-        else
-          # => 15:00
-        end
-      else
+      if (!params[:time].include?(":"))
         time = params[:time].gsub(/([a-zA-Z\+\-][0-9]?)+/, "")
 
         if (time.length < 1)
@@ -97,7 +91,6 @@ class ConvertController < ApplicationController
           newtime = tmptime.reverse.join(":")
         end
 
-        puts newtime
         params[:time] = params[:time].gsub(time, newtime)
       end
 
@@ -107,11 +100,10 @@ class ConvertController < ApplicationController
       end
 
       timezone = timezone.gsub(/\s/, "")
-      matches = params[:time].clone.match(/([a-zA-Z\+\-]+[0-9]?)+/)
+      z = params[:time].clone
+      z = z.gsub(/(pm|am)/i, "")
+      matches = z.match(/([a-zA-Z\+\-]+[0-9]?)+/)
       @response['in_timezone'] = matches == nil ? "" : matches[0].upcase
-
-      #timezone = "-300" #EST -300 minutes
-      #timezone = "GMT" #GMT -300 minutes
 
       #detect what timezone they sent
       #whole numbers mean minutes offset from UTC
@@ -177,6 +169,6 @@ class ConvertController < ApplicationController
   end
 
   def api()
-    render :layout=>"api"
+    render :layout => "api"
   end
 end
