@@ -17,6 +17,8 @@
           &nbsp;|&nbsp;
           %a{:href=>"mailto:callum@callumtaylor.net"} contact
           &nbsp;|&nbsp;
+          %a{:href=>"mailto:callum@callumtaylor.net?subject=Invalid%20time&body=This%20time%20converted%20wrong%20#{@response['in_time']}%20#{@response['in_timezone']}"} wrong time?
+          &nbsp;|&nbsp;
           %a{:href=>"https://github.com/scruffyfox/In-my-time"} github
     - if !(request.env["REQUEST_URI"] || "").include?("nojs")
       %noscript
