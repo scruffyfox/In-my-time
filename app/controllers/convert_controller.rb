@@ -51,18 +51,23 @@ class ConvertController < ApplicationController
     if (timezone != nil)
       # replace common timezones with proper timezone
       # => CT => CST
+      # => PT => PST
       timezone = timezone.gsub(/ct/i, "CST")
       params[:time] = params[:time].gsub(/ct/i, "CST")
+      timezone = timezone.gsub(/pt/i, "PST")
+      params[:time] = params[:time].gsub(/pt/i, "PST")
 
       # format all non 0-9, a-z, :, -, + characters
       params[:time] = params[:time].gsub(/([^0-9A-Za-z:-\\+\s-]+)/, "")
 
       if (!params[:time].include?(":"))
-        time = params[:time].gsub(/([a-zA-Z\+\-\s][0-9]?)+/, "")
+        time = params[:time].gsub(/([a-zA-Z\+\-\s]([0-9]+)?)+/, "")
 
         if (time.length < 1)
-          try_render({"error" => "invalid date"})
-          return
+          #try_render({"error" => "invalid date"})
+          #return
+          time = DateTime.now.strftime("%H%M")
+          params[:time] = "#{time.to_s} #{params[:time]}"
         end
 
         newtime = time.clone
@@ -97,7 +102,7 @@ class ConvertController < ApplicationController
       timezone = timezone.gsub(/\s/, "")
       z = params[:time].clone
       z = z.gsub(/(pm|am)/i, "")
-      matches = z.match(/([a-zA-Z\+\-]+[0-9]?)+/)
+      matches = z.match(/([a-zA-Z\+\-\s]([0-9]+)?)+/)
       @response['in_timezone'] = matches == nil ? "" : matches[0].upcase
 
       #detect what timezone they sent
@@ -138,7 +143,7 @@ class ConvertController < ApplicationController
         @response['out_date'] = date.strftime("%d/%m")
         @response['out_timezone'] = "UTC" + timezone
       rescue Exception => ex
-        @response = {"error" => {"message" => ex.message}}
+        @response = {"error" => {"message" => ex.message}, "code" => 1}
       end
     else
       @response = {"error" => {"message" => "No timezone supplied. Supply a header with the key \"x-timezone\" or a request parameter with the name \"timezone\""}}
@@ -158,7 +163,6 @@ class ConvertController < ApplicationController
 
       render :xml => response.to_xml(:root => 'time')
     elsif (params[:format] == 'yaml')
-      puts "test"
       render :text => response.to_yaml
     end
   end
