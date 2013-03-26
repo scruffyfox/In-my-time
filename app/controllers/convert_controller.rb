@@ -11,7 +11,8 @@ class ConvertController < ApplicationController
      'in_timezone' => '',
      'out_time' => '',
      #'out_date' => '',
-     'out_timezone' => ''
+     'out_timezone' => '',
+     'current_time' => true
     }
 
     date = DateTime.now
@@ -33,7 +34,8 @@ class ConvertController < ApplicationController
      'in_time' => '',
      'in_timezone' => '',
      'out_time' => '',
-     'out_timezone' => ''
+     'out_timezone' => '',
+     'current_time' => false
     }
 
     params[:time] = params[:time] || DateTime.now.strftime("%H:%M")
@@ -68,6 +70,7 @@ class ConvertController < ApplicationController
           #return
           time = DateTime.now.strftime("%H%M")
           params[:time] = "#{time.to_s} #{params[:time]}"
+          @response['current_time'] = true
         end
 
         newtime = time.clone
@@ -131,14 +134,20 @@ class ConvertController < ApplicationController
       end
 
       timezone = (timezone < 0 ? "" : "+") + timezone.to_s
-      timezone_diff = timezone.to_i * 60 * 60
-
+      
       begin
-        test = DateTime.parse(params[:time])
-        final_time = test.to_i + timezone_diff
+        in_time = DateTime.parse(params[:time])
+
+        if (@response['current_time'])
+        	mod = @response['in_timezone'].gsub(/[^0-9\+\-]/, "").to_i
+        	final_time = in_time.to_i + (mod * 60 * 60) * 2
+        else
+        	timezone_diff = timezone.to_i * 60 * 60
+        	final_time = in_time.to_i + timezone_diff
+        end
 
         date = Time.at(final_time).utc()
-        @response['in_time'] = test.to_formatted_s(:time)
+        @response['in_time'] = in_time.to_formatted_s(:time)
         @response['out_time'] = date.to_formatted_s(:time)
         @response['out_date'] = date.strftime("%d/%m")
         @response['out_timezone'] = "UTC" + timezone
