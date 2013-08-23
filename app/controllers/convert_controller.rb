@@ -38,6 +38,11 @@ class ConvertController < ApplicationController
      'current_time' => false
     }
 
+    if (!params[:format] && params[:time].match(/json|xml|html|yaml/))
+      params[:format] = params[:time].match(/json|xml|html|yaml/)[0]
+    end
+
+    params[:time] = params[:time] ? params[:time].gsub(/json|xml|html|yaml/, "") : ""
     params[:time] = params[:time] || DateTime.now.strftime("%H:%M")
     timezone = request.headers['x-timezone'] || params[:timezone] || getTimezone()
 
@@ -107,6 +112,7 @@ class ConvertController < ApplicationController
       z = z.gsub(/(pm|am)/i, "")
       matches = z.match(/([a-zA-Z\+\-\s]([0-9]+)?)+/)
       @response['in_timezone'] = matches == nil ? "" : matches[0].upcase
+      @response['in_timezone'] = @response['in_timezone'].strip!
 
       #detect what timezone they sent
       #whole numbers mean minutes offset from UTC
@@ -151,6 +157,7 @@ class ConvertController < ApplicationController
         @response['out_time'] = date.to_formatted_s(:time)
         @response['out_date'] = date.strftime("%d/%m")
         @response['out_timezone'] = "UTC" + timezone
+        @response['timestamp'] = date.to_i
       rescue Exception => ex
         @response = {"error" => {"message" => ex.message}, "code" => 1}
       end
