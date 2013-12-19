@@ -4,7 +4,7 @@
       %h2
         = "The current time in " + @response['in_timezone'] + " is"
       %h1
-        = @response['out_time'] + " (" + @response['in_timezone'].strip! + ")"
+        = @response['out_time'] + " (" + @response['in_timezone'].strip + ")"
     - else
       %h2
         = @response['in_time'] + " " + @response['in_timezone']

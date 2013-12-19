@@ -112,7 +112,7 @@ class ConvertController < ApplicationController
       z = z.gsub(/(pm|am)/i, "")
       matches = z.match(/([a-zA-Z\+\-\s]([0-9]+)?)+/)
       @response['in_timezone'] = matches == nil ? "" : matches[0].upcase
-      @response['in_timezone'] = @response['in_timezone'].strip!
+      @response['in_timezone'] = @response['in_timezone'].strip
 
       #detect what timezone they sent
       #whole numbers mean minutes offset from UTC
