@@ -17,7 +17,7 @@
           &nbsp;|&nbsp;
           %a{:href=>"mailto:callum@callumtaylor.net"} contact
           &nbsp;|&nbsp;
-          %a{:href=>"mailto:callum@callumtaylor.net?subject="} wrong time?
+          %a{:id => "wrongtime", :href=>"mailto:callum@callumtaylor.net?subject="} wrong time?
           &nbsp;|&nbsp;
           %a{:href=>"https://github.com/scruffyfox/In-my-time"} github
     - if !(request.env["REQUEST_URI"] || "").include?("nojs")
