@@ -41,6 +41,7 @@ class ConvertController < ApplicationController
     @response = {
      'in_time' => '',
      'in_timezone' => '',
+     'in_timezone_utc' => '',
      'out_time' => '',
      'out_timezone' => '',
      'current_time' => false
@@ -138,9 +139,9 @@ class ConvertController < ApplicationController
         timezone = -(zone / 60)
       end
 
-      timezone = timezone.to_i
+      timezone = timezone.to_i / 1.0
       if (timezone != 0)
-        timezone = timezone.to_i / 60
+        timezone = timezone.to_i / 60.0
       end
 
       timezone = (timezone < 0 ? "" : "+") + timezone.to_s
@@ -157,10 +158,12 @@ class ConvertController < ApplicationController
         end
 
         date = Time.at(final_time).utc()
+        in_timezone_utc = (in_time.utc_offset / 3600.0)
         @response['in_time'] = in_time.to_formatted_s(:time)
         @response['out_time'] = date.to_formatted_s(:time)
         @response['out_date'] = date.strftime("%d/%m")
-        @response['out_timezone'] = "UTC" + timezone
+        @response['in_timezone_utc'] = ("UTC" + (in_timezone_utc >= 0.0 ? "+" : "") + in_timezone_utc.to_s).gsub(/\./, ':')
+        @response['out_timezone'] = ("UTC" + timezone).gsub(/\./, ':')
         @response['timestamp'] = date.to_i
       rescue Exception => ex
         @response = {"error" => {"message" => ex.message}, "code" => 1}
