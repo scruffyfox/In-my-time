@@ -5,12 +5,11 @@ require 'rest'
 class ConvertController < ApplicationController
   respond_to :html, :xml, :json, :yaml
 
-  def current
+  def current()
      @response = {
      'in_time' => '',
      'in_timezone' => '',
      'out_time' => '',
-     #'out_date' => '',
      'out_timezone' => '',
      'current_time' => true
     }
@@ -29,7 +28,16 @@ class ConvertController < ApplicationController
     return result['timeZone']
   end
 
-  def index
+  def index()
+    if (params.has_key?('nojs'))
+      params[:format] = 'json'
+      @response = convert()
+    else
+      render template: 'convert/loading'
+    end
+  end
+
+  def convert()
     @response = {
      'in_time' => '',
      'in_timezone' => '',
@@ -38,18 +46,14 @@ class ConvertController < ApplicationController
      'current_time' => false
     }
 
-    if (!params[:format] && params[:time].match(/json|xml|html|yaml/))
-      params[:format] = params[:time].match(/json|xml|html|yaml/)[0]
+    params[:format] = ''
+
+    if (params[:requirements])
+      params[:format] = params[:requirements][:ext] || ""
     end
 
-    params[:time] = params[:time] ? params[:time].gsub(/json|xml|html|yaml/, "") : ""
     params[:time] = params[:time] || DateTime.now.strftime("%H:%M")
     timezone = request.headers['x-timezone'] || params[:timezone] || getTimezone()
-
-    if (!(params[:format] || "").match(/(json|xml|html|yaml)/))
-      params[:time] += "." + (params[:format] || "").clone
-      params[:format] = "html"
-    end
 
     #parse the params time
     # => 1100
@@ -166,20 +170,21 @@ class ConvertController < ApplicationController
     end
 
     try_render(@response)
+    return @response
   end
 
   def try_render(response)
     if (params[:format] == 'json')
-      render :json => response.to_json
+      render :layout => false, :json => response.to_json
     elsif (params[:format] == 'xml')
       if (response['error'])
-        render :xml => response.to_xml(:root => 'error')
+        render :layout => false, :xml => response.to_xml(:root => 'error')
         return
       end
 
-      render :xml => response.to_xml(:root => 'time')
+      render :layout => false, :xml => response.to_xml(:root => 'time')
     elsif (params[:format] == 'yaml')
-      render :text => response.to_yaml
+      render :layout => false, :text => response.to_yaml
     end
   end
 end
