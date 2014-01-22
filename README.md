@@ -10,16 +10,7 @@ Simply add this javascript to the end of your `<body>`
 
 ```js
 <script>
-	(function(d, script){
-			e=d.getElementsByClassName("inmytime")
-			for(var i in e)
-			{
-				a=new XMLHttpRequest()||new ActiveXObject("Microsoft.XMLHTTP");
-				e[i].href = "http://inmyti.me/"+e[i].innerHTML; e[i].title = e[i].innerHTML
-				a.open("GET",e[i].href + ".json", false);a.setRequestHeader("X-Timezone",""+(-new Date().getTimezoneOffset()));a.send();
-				r=JSON.parse(a.responseText);e[i].innerHTML=r.out_time+" "+r.out_timezone;
-			}
-	}(document));
+(function(t,n){e=t.getElementsByClassName("inmytime");for(var i in e){a=new XMLHttpRequest||new ActiveXObject("Microsoft.XMLHTTP");e[i].href="http://inmyti.me/"+e[i].innerHTML;e[i].title=e[i].innerHTML;a.open("GET",e[i].href+".json",false);a.setRequestHeader("X-Timezone",""+ -(new Date).getTimezoneOffset());a.send();r=JSON.parse(a.responseText);e[i].innerHTML=r.out_time+" "+r.out_timezone}})(document)
 </script>
 ```
 
