@@ -2,6 +2,39 @@
 
 The API is very straight forward and follows the following simple parameters.
 
+#Widget
+
+You can create a widget that will automatically convert time on a website to what ever the client's timezone is viewing the page.
+
+Simply add this javascript to the end of your `<body>`
+
+```js
+<script>
+	(function(d, script){
+			e=d.getElementsByClassName("inmytime")
+			for(var i in e)
+			{
+				a=new XMLHttpRequest()||new ActiveXObject("Microsoft.XMLHTTP");
+				e[i].href = "http://inmyti.me/"+e[i].innerHTML; e[i].title = e[i].innerHTML
+				a.open("GET",e[i].href + ".json", false);a.setRequestHeader("X-Timezone",""+(-new Date().getTimezoneOffset()));a.send();
+				r=JSON.parse(a.responseText);e[i].innerHTML=r.out_time+" "+r.out_timezone;
+			}
+	}(document));
+</script>
+```
+
+and wrap your times around the following tag
+
+`<a class="inmytime"></a>`
+
+For example:
+
+`<a class="inmytime">12:00 EST</a>`
+
+This will automatically replace the contents inside the link, make it linkable to http://inmyti.me and also have the original time as a mouse over hint.
+
+Note: the times have to be in a recognisable format such as below.
+
 #Possible calls
 
 The following calls would be vaild, all base URLs are `http://inmyti.me`

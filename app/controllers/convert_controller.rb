@@ -53,6 +53,11 @@ class ConvertController < ApplicationController
       params[:format] = params[:requirements][:ext] || ""
     end
 
+    if (request.method == "OPTIONS")
+      try_render({"ok" => 1})
+      return
+    end
+
     params[:time] = params[:time] || DateTime.now.strftime("%H:%M")
     timezone = request.headers['x-timezone'] || params[:timezone] || getTimezone()
 
