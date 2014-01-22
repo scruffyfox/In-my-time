@@ -115,9 +115,13 @@ class ConvertController < ApplicationController
       timezone = timezone.gsub(/\s/, "")
       z = params[:time].clone
       z = z.gsub(/(pm|am)/i, "")
-      matches = z.match(/([a-zA-Z\+\-\s]([0-9]+)?)+/)
+      matches = z.match(/([a-zA-Z\+\-\s]([0-9:]+)?)+/)
       @response['in_timezone'] = matches == nil ? "" : matches[0].upcase
       @response['in_timezone'] = @response['in_timezone'].strip
+
+      if (@response['in_timezone'] == "")
+        @response['in_timezone'] = "UTC"
+      end
 
       #detect what timezone they sent
       #whole numbers mean minutes offset from UTC
@@ -144,7 +148,7 @@ class ConvertController < ApplicationController
         timezone = timezone.to_i / 60.0
       end
 
-      timezone = (timezone < 0 ? "" : "+") + timezone.to_s
+      timezone_str = convert_timezone(timezone)
       
       begin
         in_time = DateTime.parse(params[:time])
@@ -153,17 +157,18 @@ class ConvertController < ApplicationController
         	mod = @response['in_timezone'].gsub(/[^0-9\+\-]/, "").to_i
         	final_time = in_time.to_i + (mod * 60 * 60) * 2
         else
-        	timezone_diff = timezone.to_i * 60 * 60
+        	timezone_diff = timezone * 60 * 60
         	final_time = in_time.to_i + timezone_diff
         end
 
         date = Time.at(final_time).utc()
-        in_timezone_utc = (in_time.utc_offset / 3600.0)
+        in_timezone_utc = convert_timezone(in_time.utc_offset / 3600.0)
+
         @response['in_time'] = in_time.to_formatted_s(:time)
         @response['out_time'] = date.to_formatted_s(:time)
         @response['out_date'] = date.strftime("%d/%m")
-        @response['in_timezone_utc'] = ("UTC" + (in_timezone_utc >= 0.0 ? "+" : "") + in_timezone_utc.to_s).gsub(/\./, ':')
-        @response['out_timezone'] = ("UTC" + timezone).gsub(/\./, ':')
+        @response['in_timezone_utc'] = ("UTC" + in_timezone_utc)
+        @response['out_timezone'] = ("UTC" + timezone_str).gsub(/\./, ':')
         @response['timestamp'] = date.to_i
       rescue Exception => ex
         @response = {"error" => {"message" => ex.message}, "code" => 1}
@@ -174,6 +179,14 @@ class ConvertController < ApplicationController
 
     try_render(@response)
     return @response
+  end
+
+  def convert_timezone(corrected_timezone)
+    floored = corrected_timezone.floor
+    decimal = corrected_timezone - floored
+    minutes = (decimal * 60).floor
+    timezone = (corrected_timezone < 0 ? "" : "+") + (floored.to_s + (minutes == 0 ? "" : ":" + minutes.to_s))
+    return timezone
   end
 
   def try_render(response)
