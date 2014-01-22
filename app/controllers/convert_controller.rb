@@ -69,22 +69,25 @@ class ConvertController < ApplicationController
       # replace common timezones with proper timezone
       # => CT => CST
       # => PT => PST
-      timezone = timezone.gsub(/ct/i, "CST")
-      params[:time] = params[:time].gsub(/ct/i, "CST")
-      timezone = timezone.gsub(/pt/i, "PST")
-      params[:time] = params[:time].gsub(/pt/i, "PST")
+      replacements = [[/ct/i, "CST"], [/pt/i, "PST"]]
+      replacements.each {|replacement| 
+        timezone.gsub!(replacement[0], replacement[1])
+        params[:time].gsub!(replacement[0], replacement[1])
+      }
+
+      # timezone.gsub!(/[\s+]/, "")
 
       # format all non 0-9, a-z, :, -, + characters
-      params[:time] = params[:time].gsub(/([^0-9A-Za-z:-\\+\s-]+)/, "")
+      params[:time].gsub!(/([^0-9A-Za-z:-\\+\s-]+)/, "")
 
       if (!params[:time].include?(":"))
-        time = params[:time].gsub(/([a-zA-Z\+\-\s]([0-9]+)?)+/, "")
+        time = params[:time].sub(/([a-zA-Z\+\-\s]([0-9]+)?)+/, "")
 
         if (time.length < 1)
           #try_render({"error" => "invalid date"})
           #return
           time = DateTime.now.strftime("%H%M")
-          params[:time] = "#{time.to_s} #{params[:time]}"
+          params[:time] = "#{time} #{params[:time]}"
           @response['current_time'] = true
         end
 
@@ -109,67 +112,63 @@ class ConvertController < ApplicationController
           newtime = tmptime.reverse.join(":")
         end
 
-        params[:time] = params[:time].gsub(time, newtime)
+        params[:time].gsub!(time, newtime)
       end
 
+      in_timezone = params[:time]
       if (params[:time].match(/(am|pm)(\s{0}?)/))
         # => 15:00pm | 15:00am
-        params[:time] = params[:time].sub(/(am|pm)/){$1 + " "}
+        params[:time].sub!(/(am|pm)/){$1 + " "}
+        in_timezone = params[:time].gsub(/(pm|am)/i, "")
       end
 
-      timezone = timezone.gsub(/\s/, "")
-      z = params[:time].clone
-      z = z.gsub(/(pm|am)/i, "")
-      matches = z.match(/([a-zA-Z\+\-\s]([0-9:]+)?)+/)
-      @response['in_timezone'] = matches == nil ? "" : matches[0].upcase
-      @response['in_timezone'] = @response['in_timezone'].strip
-
-      if (@response['in_timezone'] == "")
-        @response['in_timezone'] = "UTC"
-      end
+      matches = in_timezone.match(/([a-zA-Z\+\-\s]([0-9:]+)?)+/)
+      @response['in_timezone'] = matches == nil ? "UTC" : matches[0].upcase
+      @response['in_timezone'].gsub!(/[\s]/, "")
 
       #detect what timezone they sent
       #whole numbers mean minutes offset from UTC
       #accepted other formats:
       # => (GMT/UTC)+/-0-14
+      timezone.gsub!(/[\s]/, "")
       if (timezone.match(/[^0-9\+-]/))
         if (!timezone.match(/(-|\+)/))
-          tmp_zone = timezone.clone
-          tmp_zone = tmp_zone.gsub(/[^0-9-]/, "")
-          original_zone_time = tmp_zone.clone
+          tmp_zone = timezone.gsub(/[^0-9-]/, "")
+          timezone_index = timezone.index(tmp_zone)
 
           if (tmp_zone.to_i > 0)
-            tmp_zone = "+" + tmp_zone
-            timezone = timezone.gsub(original_zone_time, tmp_zone)
+            timezone.insert(timezone_index, "+")
           end
         end
 
-        zone = DateTime.parse("1/1/1970 12am " + timezone).to_i
+        zone = DateTime.parse("1/1/1970 12am #{timezone}").to_i
         timezone = -(zone / 60)
       end
 
-      timezone = timezone.to_i / 1.0
+      timezone = timezone / 1.0
       if (timezone != 0)
-        timezone = timezone.to_i / 60.0
+        timezone = timezone / 60.0
       end
 
       timezone_str = convert_timezone(timezone)
       
       begin
-        in_time = DateTime.parse(params[:time])
+        date_time = DateTime.parse(params[:time])
+        in_time = date_time.to_i
+        int_time_offset = date_time.utc_offset
 
         if (@response['current_time'])
         	mod = @response['in_timezone'].gsub(/[^0-9\+\-]/, "").to_i
-        	final_time = in_time.to_i + (mod * 60 * 60) * 2
+        	final_time = in_time + (mod * 3600) * 2
         else
-        	timezone_diff = timezone * 60 * 60
-        	final_time = in_time.to_i + timezone_diff
+        	timezone_diff = timezone * 3600
+        	final_time = in_time + timezone_diff
         end
 
         date = Time.at(final_time).utc()
-        in_timezone_utc = convert_timezone(in_time.utc_offset / 3600.0)
+        in_timezone_utc = convert_timezone(int_time_offset / 3600.0)
 
-        @response['in_time'] = in_time.to_formatted_s(:time)
+        @response['in_time'] = date_time.to_formatted_s(:time)
         @response['out_time'] = date.to_formatted_s(:time)
         @response['out_date'] = date.strftime("%d/%m")
         @response['in_timezone_utc'] = ("UTC" + in_timezone_utc)
