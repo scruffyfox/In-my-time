@@ -1,11 +1,9 @@
-%h1.time
-  = "Current time is " + @response['out_time'] + " " + @response['out_timezone']
-.example
-  %p
-    Examples:
-  %p 
-    %a{:href=>"http://inmyti.me/12pmEST"} http://inmyti.me/12pm EST
-    %br
-    %a{:href=>"http://inmyti.me/1700GMT-5"} http://inmyti.me/1700 GMT-5
-    %br
-    %a{:href=>"http://inmyti.me/1.30PDT"} http://inmyti.me/1.30 PDT
+%h2
+  Convert any time into your local time
+.input
+  // .left
+  // &nbsp;
+  %form
+    %input{"type" => "input", "name" => "time", "placeholder" => "Type your time here and press enter. " + @response['out_time'] + " " + @response['out_timezone']}
+  // .right
+  // &nbsp;
