@@ -260,7 +260,9 @@ class ConvertController < ApplicationController
       params[:time].gsub!(/([^0-9A-Za-z:-\\+\s-]+)/, "")
 
       if (!params[:time].include?(":"))
-        time = params[:time].sub(/([a-zA-Z\+\-\s]([0-9]+)?)+/, "")
+        time = params[:time].sub(/([a-zA-Z\+\-\s]{2,}([0-9]+)?)+/, "")
+
+        puts time
 
         if (time.length < 1)
           #try_render({"error" => "invalid date"})
@@ -268,6 +270,9 @@ class ConvertController < ApplicationController
           time = DateTime.now.strftime("%H%M")
           params[:time] = "#{time} #{params[:time]}"
           @response['current_time'] = true
+        elsif (time.sub(/(\s)+/, "").length > 4)
+          time = time.sub(/(\s)+/, "")
+          time = time.slice(0, 4)
         end
 
         newtime = time.clone
@@ -295,13 +300,14 @@ class ConvertController < ApplicationController
       end
 
       in_timezone = params[:time]
-      if (params[:time].match(/(am|pm)(\s{0}?)/))
+
+      if (params[:time].match(/(am|pm)(\s{0}?)/i))
         # => 15:00pm | 15:00am
-        params[:time].sub!(/(am|pm)/){$1 + " "}
+        params[:time].sub!(/(am|pm)/i){$1 + " "}
         in_timezone = params[:time].gsub(/(pm|am)/i, "")
       end
-
-      matches = in_timezone.match(/([a-zA-Z\+\-\s]([0-9:]+)?)+/)
+      
+      matches = in_timezone.match(/([a-zA-Z\+\-\s]{2,}([0-9]+)?)+/)
       @response['in_timezone'] = matches == nil ? "UTC" : matches[0].upcase
       @response['in_timezone'].gsub!(/[\s]/, "")
 
