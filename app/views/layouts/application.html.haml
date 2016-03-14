@@ -6,12 +6,12 @@
     = stylesheet_link_tag "application"
     = javascript_include_tag "application"
     %script{:src=>"app.js", :type=>"text/javascript"}
-
+    %meta{:name=>"description", :content=>"Convert any human readable time into your local timezone. What is 10am PDT in my time?"}
+   
     %body{"onload" => "loadTime()"}
       .content
         #time
           = yield
-
         .footer
           %a{:href=>"https://github.com/scruffyfox/In-my-time/blob/master/README.md"} api
           &nbsp;|&nbsp;
